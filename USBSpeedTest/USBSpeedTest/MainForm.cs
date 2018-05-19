@@ -103,6 +103,28 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
                     MyLog.Info(USB.MyDeviceList[key].FriendlyName + ConfigurationManager.AppSettings[USB.MyDeviceList[key].FriendlyName] + "连接");
 
+
+                    USB.SendCMD(0, 0x81, 0x7f);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x81, 0x00);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x82, 0x7f);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x82, 0x00);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x83, 0x7f);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x83, 0x00);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x84, 0x7f);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x84, 0x00);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x85, 0x7f);
+                    Thread.Sleep(100);
+                    USB.SendCMD(0, 0x85, 0x00);
+                    Thread.Sleep(100);
+
                 }
             }
 
@@ -486,18 +508,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
         private void button6_Click(object sender, EventArgs e)
         {
-            String Str_Content = textBox7.Text.Replace(" ", "");
-            int lenth = (Str_Content.Length) / 2;
 
-            if (lenth < 4)
-            {
-                byte[] temp = StrToHexByte(textBox8.Text + lenth.ToString("x4") + Str_Content + textBox9.Text);
-                USB.SendDataByInt(0, temp);
-            }
-            else
-            {
-                MyLog.Error("请至少输入4个Byte的数据");
-            }
         }
 
         private static byte[] StrToHexByte(string hexString)
@@ -528,8 +539,6 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 }
 
                 byte[] temp = StrToHexByte(textBox8.Text + lenth.ToString("x4") + Str_Content + textBox9.Text);
-
-
 
                 USB.SendData(0, temp);
             }
@@ -701,11 +710,10 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                     for (int i = 0; i < (4 - AddToFour); i++) Str_Content += "00";
                 }
 
-
-
                 for (int j = 0; j < 8; j++)
                 {
                     byte[] temp = StrToHexByte((0x1D00+j).ToString("x4") + lenth.ToString("x4") + Str_Content + textBox9.Text);
+                    temp[4] = (byte)(0x1 + j);
                     USB.SendData(0, temp);
                 }
             }
@@ -719,108 +727,126 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         int DisLen = 2000000;
         private void btn_SerialOpen_2_Click(object sender, EventArgs e)
         {
-            ComPortRecv = new SerialPort();
-            ComPortRecv.BaudRate = Convert.ToInt32(comboBox_SerialBaudrate_2.Text);
-            ComPortRecv.PortName = comboBox_SerialPortNum_2.Text;
-            ComPortRecv.DataBits = Convert.ToInt32(comboBox_SerialDatabit_2.Text);
-
-            switch (comboBox_SerialStopbit_2.Text)
+            try
             {
-                case "1":
-                    ComPortRecv.StopBits = StopBits.One;
-                    break;
-                case "1.5":
-                    ComPortRecv.StopBits = StopBits.OnePointFive;
-                    break;
-                case "2":
-                    ComPortRecv.StopBits = StopBits.Two;
-                    break;
-                default:
-                    MessageBox.Show("Error:停止位参数设置不正确", "Error");
-                    break;
-            }
+                ComPortRecv = new SerialPort();
+                ComPortRecv.BaudRate = Convert.ToInt32(comboBox_SerialBaudrate_2.Text);
+                ComPortRecv.PortName = comboBox_SerialPortNum_2.Text;
+                ComPortRecv.DataBits = Convert.ToInt32(comboBox_SerialDatabit_2.Text);
 
-            switch (comboBox_SerialParity_2.Text)
+                switch (comboBox_SerialStopbit_2.Text)
+                {
+                    case "1":
+                        ComPortRecv.StopBits = StopBits.One;
+                        break;
+                    case "1.5":
+                        ComPortRecv.StopBits = StopBits.OnePointFive;
+                        break;
+                    case "2":
+                        ComPortRecv.StopBits = StopBits.Two;
+                        break;
+                    default:
+                        MessageBox.Show("Error:停止位参数设置不正确", "Error");
+                        break;
+                }
+
+                switch (comboBox_SerialParity_2.Text)
+                {
+                    case "无校验":
+                        ComPortRecv.Parity = Parity.None;
+                        break;
+                    case "偶校验":
+                        ComPortRecv.Parity = Parity.Even;
+                        break;
+                    case "奇校验":
+                        ComPortRecv.Parity = Parity.Odd;
+                        break;
+                    default:
+                        MessageBox.Show("Error:校验位参数设置不正确", "Error");
+                        break;
+                }
+
+                ComPortRecv.ReadTimeout = 1000;
+                //ComPortRecv.ReceivedBytesThreshold = 1;
+                ComPortRecv.Open();
+                MyLog.Info("接收串口打开成功");
+
+                //事件注册
+                ComPortRecv.DataReceived += ComPortRecv_DataReceived;
+            }
+            catch(Exception ex)
             {
-                case "无校验":
-                    ComPortRecv.Parity = Parity.None;
-                    break;
-                case "偶校验":
-                    ComPortRecv.Parity = Parity.Even;
-                    break;
-                case "奇校验":
-                    ComPortRecv.Parity = Parity.Odd;
-                    break;
-                default:
-                    MessageBox.Show("Error:校验位参数设置不正确", "Error");
-                    break;
+                Trace.WriteLine(ex.Message);
             }
-
-            ComPortRecv.ReadTimeout = 3000;
-            //ComPortRecv.ReceivedBytesThreshold = 1;
-            ComPortRecv.Open();
-            MyLog.Info("接收串口打开成功");
-
-            //事件注册
-            ComPortRecv.DataReceived += ComPortRecv_DataReceived; ;
+            
         }
 
         private void ComPortRecv_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            //  throw new NotImplementedException();
+            //throw new NotImplementedException();
             Thread.Sleep(100);
-            byte[] byteRead = new byte[ComPortRecv.BytesToRead];
-            ComPortRecv.Read(byteRead, 0, byteRead.Length);
-            //5a 54 01 02 03 04 05 06 07 08 00 5a fe 09 0a 0b 00 ff ff 00 0e 00 aa 5a fe
-            int N = 53 + 11;
-            byte[] SendToMac = new byte[N];
-            SendToMac[0] = 0x5a;
-            SendToMac[1] = 0x54;
-            for (int i = 2; i < 53+2; i++) SendToMac[i] = 0x00;
-            SendToMac[2] = 0x81;
-
-            SendToMac[N - 9] = 0x00;
-            SendToMac[N - 8] = 0xff;
-            SendToMac[N - 7] = 0xff;
-            SendToMac[N - 6] = 0x00;
-            SendToMac[N - 5] = 0x53;
-            SendToMac[N - 4] = 0x00;
-            SendToMac[N - 3] = 0xaa;
-            SendToMac[N - 2] = 0x5a;
-            SendToMac[N - 1] = 0xfe;
-
-
-            if (byteRead.Length>0)
+            try
             {
-                if(byteRead[0]==0xAB)
-                {
-                    for (int j = 0; j < 10; j++)
-                    {
-                        this.textBox11.Invoke(new Action(() => { this.textBox11.AppendText((DisLen / 10).ToString() + "m， "); }));
-                        DisLen -= 5000;
-                        if (DisLen > 0)
-                        {
-                            SendToMac[11] = (byte)(DisLen & 0xff);
-                            SendToMac[12] = (byte)((DisLen >> 8) & 0xff);
-                            SendToMac[13] = (byte)((DisLen >> 16) & 0xff);
-                            SendToMac[14] = (byte)((DisLen >> 24) & 0xff);
-                        }
-                        else
-                        {
-                            SendToMac[11] = 0x00;
-                            SendToMac[12] = 0x00;
-                            SendToMac[13] = 0x00;
-                            SendToMac[14] = 0x00;
-                        }
+                byte[] byteRead = new byte[ComPortRecv.BytesToRead];
+                ComPortRecv.Read(byteRead, 0, byteRead.Length);
+                //5a 54 01 02 03 04 05 06 07 08 00 5a fe 09 0a 0b 00 ff ff 00 0e 00 aa 5a fe
+                int N = 53 + 11;
+                byte[] SendToMac = new byte[N];
+                SendToMac[0] = 0x5a;
+                SendToMac[1] = 0x54;
+                for (int i = 2; i < 53 + 2; i++) SendToMac[i] = 0x00;
+                SendToMac[2] = 0x81;
 
-                        ComPortRecv.Write(SendToMac, 0, SendToMac.Count());
-                       // Thread.Sleep(1);
+                SendToMac[N - 9] = 0x00;
+                SendToMac[N - 8] = 0xff;
+                SendToMac[N - 7] = 0xff;
+                SendToMac[N - 6] = 0x00;
+                SendToMac[N - 5] = 0x53;
+                SendToMac[N - 4] = 0x00;
+                SendToMac[N - 3] = 0xaa;
+                SendToMac[N - 2] = 0x5a;
+                SendToMac[N - 1] = 0xfe;
+
+
+                if (byteRead.Length > 0)
+                {
+                    if (byteRead[0] == 0xAB)
+                    {
+                        if (ExecDec) DisLen -= DecKM;
+                        for (int j = 0; j < 30; j++)
+                        {
+                            this.textBox11.BeginInvoke(new Action(() => { this.textBox11.AppendText((DisLen / 10).ToString() + "m， "); }));
+                            
+                            //MyLog.Info((DisLen / 10).ToString() + "m");
+                            if (DisLen > 0)
+                            {
+                                SendToMac[11] = (byte)(DisLen & 0xff);
+                                SendToMac[12] = (byte)((DisLen >> 8) & 0xff);
+                                SendToMac[13] = (byte)((DisLen >> 16) & 0xff);
+                                SendToMac[14] = (byte)((DisLen >> 24) & 0xff);
+                            }
+                            else
+                            {
+                                DisLen = 0;
+                                SendToMac[11] = 0x00;
+                                SendToMac[12] = 0x00;
+                                SendToMac[13] = 0x00;
+                                SendToMac[14] = 0x00;
+                            }
+
+                            ComPortRecv.Write(SendToMac, 0, SendToMac.Count());
+                            // Thread.Sleep(1);
+                        }
+                    }
+                    else
+                    {
+                        MyLog.Error("串口收到非0xAB数据！");
                     }
                 }
-                else
-                {
-                    MyLog.Error("串口收到非0xAB数据！");
-                }
+            }
+            catch(Exception ex)
+            {
+                Trace.WriteLine(ex.Message+ "--ComPortRecv_DataReceived");
             }
         }
 
@@ -852,10 +878,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
         private void button32_Click(object sender, EventArgs e)
         {
-            ComPortRecv.DataReceived -= ComPortRecv_DataReceived;
+            ComPortRecv.Close();
+            Thread.Sleep(1000);
+         //   ComPortRecv.DataReceived -= ComPortRecv_DataReceived;
 
             Thread.Sleep(1000);
-            ComPortRecv.Close();
+  
 
             MyLog.Info("接收串口关闭成功");
         }
@@ -868,6 +896,45 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         private void button6_Click_1(object sender, EventArgs e)
         {
             this.textBox11.Clear();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            double t = double.Parse(textBox12.Text);
+            DisLen = (int)(t * 10000);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            USB.SendCMD(0, 0x82, 0x7f);
+            Thread.Sleep(100);
+            USB.SendCMD(0, 0x82, 0x00);
+            Thread.Sleep(100);
+            USB.SendCMD(0, 0x83, 0x01);
+            Thread.Sleep(100);
+            USB.SendCMD(0, 0x83, 0x00);
+        }
+
+        bool ExecDec = false;
+        private void button11_Click(object sender, EventArgs e)
+        {
+            if(button11.Text=="开启-每次递减")
+            {
+                button11.Text = "关闭-每次递减";
+                ExecDec = true;
+            }
+            else
+            {
+                button11.Text = "开启-每次递减";
+                ExecDec = false;
+            }
+        }
+
+        int DecKM = 5000;
+        private void button12_Click(object sender, EventArgs e)
+        {
+            double t = double.Parse(textBox13.Text);
+            DecKM =(int)(t * 10);
         }
     }
 
