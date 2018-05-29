@@ -18,3 +18,13 @@ D:\CSharpProjects\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.RegisterFor
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.csproj.GenerateResource.Cache
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.exe
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.pdb
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Release\DZ_USBTest.exe.config
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Release\DZ_USBTest.exe
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Release\DZ_USBTest.pdb
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Release\CyUSB.dll
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.MainForm.resources
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.Properties.Resources.resources
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.RegisterForm.resources
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.csproj.GenerateResource.Cache
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.exe
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.pdb
