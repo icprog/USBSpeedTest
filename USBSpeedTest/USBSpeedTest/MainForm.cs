@@ -807,7 +807,6 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 SendToMac[N - 2] = 0x5a;
                 SendToMac[N - 1] = 0xfe;
 
-
                 if (byteRead.Length > 0)
                 {
                     if (byteRead[0] == 0xAB)
@@ -840,7 +839,9 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                     }
                     else
                     {
-                        MyLog.Error("串口收到非0xAB数据！");
+                        String temp = "";
+                        for (int i = 0; i < byteRead.Length; i++) temp += byteRead[i].ToString("x2");
+                        MyLog.Error("串口收到非0xAB数据！-----"+temp);
                     }
                 }
             }

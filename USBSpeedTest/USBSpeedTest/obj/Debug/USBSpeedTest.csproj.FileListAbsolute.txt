@@ -40,3 +40,4 @@ D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.csproj.GenerateResource.Cache
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\DZ_USBTest.exe
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\DZ_USBTest.pdb
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.csprojResolveAssemblyReference.cache
