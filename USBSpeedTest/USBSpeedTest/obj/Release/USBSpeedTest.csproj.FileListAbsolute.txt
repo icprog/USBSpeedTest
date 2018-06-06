@@ -29,4 +29,3 @@ D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTes
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.exe
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\DZ_USBTest.pdb
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.ADForm.resources
-D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Release\USBSpeedTest.csprojResolveAssemblyReference.cache

@@ -489,6 +489,11 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         for (int k = 0; k < 8; k++)
                         {
                             int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                            {
+                                temp = 0x8000 - temp;
+                            }
                             double value = temp;
                             value = 10 * (value / 32767);
                             if ((buf[2 * k] & 0x80) == 0x80)
@@ -521,6 +526,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         for (int k = 0; k < 8; k++)
                         {
                             int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                            {
+                                temp = 0x8000 - temp;
+                            }
+
                             double value = temp;
                             value = 10 * (value / 32767);
                             if ((buf[2 * k] & 0x80) == 0x80)
