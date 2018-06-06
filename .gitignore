@@ -1,2 +1,6 @@
 
 USBSpeedTest/.vs/USBSpeedTest/v15/.suo
+*.dat
+*.pdb
+*.pdb
+*.Cache

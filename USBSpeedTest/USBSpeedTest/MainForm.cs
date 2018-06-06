@@ -489,10 +489,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         for (int k = 0; k < 8; k++)
                         {
                             int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+                            double value = temp;
+                            value = 10 * (value / 32767);
                             if ((buf[2 * k] & 0x80) == 0x80)
-                                Data.daRe_AD01[k] = -temp;
+                                Data.daRe_AD01[k] = -value;
                             else
-                                Data.daRe_AD01[k] = temp;
+                                Data.daRe_AD01[k] = value;
                         }
                         Data.ADList01.RemoveRange(0, 16);
 
@@ -519,10 +521,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         for (int k = 0; k < 8; k++)
                         {
                             int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+                            double value = temp;
+                            value = 10 * (value / 32767);
                             if ((buf[2 * k] & 0x80) == 0x80)
-                                Data.daRe_AD02[k] = -temp;
+                                Data.daRe_AD02[k] = -value;
                             else
-                                Data.daRe_AD02[k] = temp;
+                                Data.daRe_AD02[k] = value;
                         }
                         Data.ADList02.RemoveRange(0, 16);
                     }
