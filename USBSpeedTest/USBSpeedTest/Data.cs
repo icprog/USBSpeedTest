@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Xml.Linq;
 using System.Xml;
+using System.Data;
 
 namespace USBSpeedTest
 {
@@ -19,6 +20,13 @@ namespace USBSpeedTest
         public static bool SaveSC3 = true;
         public static bool SaveSC4 = true;
 
+        public static List<byte> ADList01 = new List<byte>();//1D06
+        public static List<byte> ADList02 = new List<byte>();//1D07
+        public static DataTable dt_AD01 = new DataTable();
+        public static DataTable dt_AD02 = new DataTable();
+        public static double[] daRe_AD01 = new double[8] { 0,0,0,0,0,0,0,0};
+        public static double[] daRe_AD02 = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        public static bool AdFrmIsAlive = false;
 
         public static double[] value_a = new double[128];                         //DA修正参数a
         public static double[] value_b = new double[128];                         //DA修正参数b
