@@ -17,7 +17,7 @@ namespace USBSpeedTest
     public partial class MainForm : Form
     {
         public RegisterForm myRegisterForm;
-
+        public ADForm myADForm;
         SaveFile FileThread = null;
         public byte[] TempStoreBuf = new byte[8192];
         public int TempStoreBufTag = 0;
@@ -82,6 +82,34 @@ namespace USBSpeedTest
         {
             SetDevice(false);
             myRegisterForm = new RegisterForm();
+
+
+            Data.dt_AD01.Columns.Add("序号", typeof(Int32));
+            Data.dt_AD01.Columns.Add("名称", typeof(String));
+            Data.dt_AD01.Columns.Add("测量值", typeof(double));
+            for (int i = 0; i < 8; i++)
+            {
+                DataRow dr = Data.dt_AD01.NewRow();
+                dr["序号"] = i + 1;
+                dr["名称"] = "通道" + (i + 1).ToString();
+                dr["测量值"] = 0;
+                Data.dt_AD01.Rows.Add(dr);
+            }
+
+
+            Data.dt_AD02.Columns.Add("序号", typeof(Int32));
+            Data.dt_AD02.Columns.Add("名称", typeof(String));
+            Data.dt_AD02.Columns.Add("测量值", typeof(double));
+            for (int i = 8; i < 16; i++)
+            {
+                DataRow dr = Data.dt_AD02.NewRow();
+                dr["序号"] = i + 1;
+                dr["名称"] = "通道" + (i + 1).ToString();
+                dr["测量值"] = 0;
+                Data.dt_AD02.Rows.Add(dr);
+            }
+
+            myADForm = new ADForm();
         }
 
         /*Summary
@@ -181,7 +209,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 LastCount = 0;
 
                 new Thread(() => { RecvAllUSB(); }).Start();
-
+                new Thread(() => { DealWithADFun(); }).Start();
 
             }
             else
@@ -405,6 +433,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         SaveFile.Lock_13.EnterWriteLock();
                         SaveFile.DataQueue_SC13.Enqueue(buf1D0x);
                         SaveFile.Lock_13.ExitWriteLock();
+
+                        lock (Data.ADList01)
+                        {
+                            for (int j = 0; j < num; j++)
+                                Data.ADList01.Add(buf1D0x[j]);
+                        }
                     }
                     else if (bufsav[i * 682 + 0] == 0x1D && bufsav[i * 682 + 1] == 0x07)
                     {
@@ -414,6 +448,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         SaveFile.Lock_14.EnterWriteLock();
                         SaveFile.DataQueue_SC14.Enqueue(buf1D0x);
                         SaveFile.Lock_14.ExitWriteLock();
+                        lock (Data.ADList02)
+                        {
+                            for (int j = 0; j < num; j++)
+                                Data.ADList02.Add(buf1D0x[j]);
+                        }
+
                     }
                     else if (bufsav[i * 682 + 0] == 0x1D && bufsav[i * 682 + 1] == 0x0f)
                     {
@@ -424,6 +464,95 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         Trace.WriteLine("FF08通道出错!");
                     }
                 }
+            }
+        }
+
+        private void DealWithADFun()
+        {
+            while (RecvTag)
+            {
+                bool Tag1 = false;
+                bool Tag2 = false;
+
+                lock (Data.ADList01)
+                {
+
+                    if (Data.ADList01.Count > 16)
+                    {
+                        Tag1 = true;
+
+                        byte[] buf = new byte[16];
+                        for (int t = 0; t < 16; t++)
+                        {
+                            buf[t] = Data.ADList01[t];
+                        }
+                        for (int k = 0; k < 8; k++)
+                        {
+                            int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                            {
+                                temp = 0x8000 - temp;
+                            }
+                            double value = temp;
+                            value = 10 * (value / 32767);
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                                Data.daRe_AD01[k] = -value;
+                            else
+                                Data.daRe_AD01[k] = value;
+                        }
+                        Data.ADList01.RemoveRange(0, 16);
+
+                    }
+                    else
+                    {
+                        Tag1 = false;        
+                    }
+
+                }
+
+
+                lock (Data.ADList02)
+                {
+
+                    if (Data.ADList02.Count > 16)
+                    {
+                        Tag2 = true;
+                        byte[] buf = new byte[16];
+                        for (int t = 0; t < 16; t++)
+                        {
+                            buf[t] = Data.ADList02[t];
+                        }
+                        for (int k = 0; k < 8; k++)
+                        {
+                            int temp = (buf[2 * k] & 0x7f) * 256 + buf[2 * k + 1];
+
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                            {
+                                temp = 0x8000 - temp;
+                            }
+
+                            double value = temp;
+                            value = 10 * (value / 32767);
+                            if ((buf[2 * k] & 0x80) == 0x80)
+                                Data.daRe_AD02[k] = -value;
+                            else
+                                Data.daRe_AD02[k] = value;
+                        }
+                        Data.ADList02.RemoveRange(0, 16);
+                    }
+                    else
+                    {
+                        Tag2 = false;
+                    }
+                }
+
+                if (Tag1 == false && Tag2 == false)
+                {
+                    Thread.Sleep(500);
+                }
+
+
             }
         }
 
@@ -559,7 +688,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
             if (tempList[0] == "0")
             {
 
-                btn.Text = "1:"+tempList[1];
+                btn.Text = "1:" + tempList[1];
 
                 byte addr = Convert.ToByte(str.Substring(4, 2), 16);
                 int bitpos = Convert.ToByte(str.Substring(7, 1), 10);
@@ -637,7 +766,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
             //}
             else
             {
-//                btn.Text = "0";
+                //                btn.Text = "0";
 
                 btn.Text = "0:" + tempList[1];
 
@@ -712,7 +841,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
                 for (int j = 0; j < 8; j++)
                 {
-                    byte[] temp = StrToHexByte((0x1D00+j).ToString("x4") + lenth.ToString("x4") + Str_Content + textBox9.Text);
+                    byte[] temp = StrToHexByte((0x1D00 + j).ToString("x4") + lenth.ToString("x4") + Str_Content + textBox9.Text);
                     temp[4] = (byte)(0x1 + j);
                     USB.SendData(0, temp);
                 }
@@ -774,11 +903,11 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 //事件注册
                 ComPortRecv.DataReceived += ComPortRecv_DataReceived;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Trace.WriteLine(ex.Message);
             }
-            
+
         }
 
         private void ComPortRecv_DataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -815,7 +944,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         for (int j = 0; j < 30; j++)
                         {
                             this.textBox11.BeginInvoke(new Action(() => { this.textBox11.AppendText((DisLen / 10).ToString() + "m， "); }));
-                            
+
                             //MyLog.Info((DisLen / 10).ToString() + "m");
                             if (DisLen > 0)
                             {
@@ -841,13 +970,13 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                     {
                         String temp = "";
                         for (int i = 0; i < byteRead.Length; i++) temp += byteRead[i].ToString("x2");
-                        MyLog.Error("串口收到非0xAB数据！-----"+temp);
+                        MyLog.Error("串口收到非0xAB数据！-----" + temp);
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Trace.WriteLine(ex.Message+ "--ComPortRecv_DataReceived");
+                Trace.WriteLine(ex.Message + "--ComPortRecv_DataReceived");
             }
         }
 
@@ -881,10 +1010,10 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         {
             ComPortRecv.Close();
             Thread.Sleep(1000);
-         //   ComPortRecv.DataReceived -= ComPortRecv_DataReceived;
+            //   ComPortRecv.DataReceived -= ComPortRecv_DataReceived;
 
             Thread.Sleep(1000);
-  
+
 
             MyLog.Info("接收串口关闭成功");
         }
@@ -919,7 +1048,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         bool ExecDec = false;
         private void button11_Click(object sender, EventArgs e)
         {
-            if(button11.Text=="开启-每次递减")
+            if (button11.Text == "开启-每次递减")
             {
                 button11.Text = "关闭-每次递减";
                 ExecDec = true;
@@ -935,7 +1064,32 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         private void button12_Click(object sender, EventArgs e)
         {
             double t = double.Parse(textBox13.Text);
-            DecKM =(int)(t * 10);
+            DecKM = (int)(t * 10);
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (Data.AdFrmIsAlive)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    Data.dt_AD01.Rows[i]["测量值"] = Data.daRe_AD01[i];
+                    Data.dt_AD02.Rows[i]["测量值"] = Data.daRe_AD02[i];
+                }
+            }
+        }
+
+        private void 查看AD数据ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if(Data.AdFrmIsAlive)
+            {
+                myADForm.Activate();
+            }
+            else
+            {
+                myADForm = new ADForm();
+            }
+            myADForm.Show();
         }
     }
 

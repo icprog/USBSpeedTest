@@ -34,10 +34,10 @@ D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Debug\DZ_USBTest.ex
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Debug\DZ_USBTest.exe
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Debug\DZ_USBTest.pdb
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\bin\Debug\CyUSB.dll
+D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.ADForm.resources
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.MainForm.resources
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.Properties.Resources.resources
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.RegisterForm.resources
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.csproj.GenerateResource.Cache
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\DZ_USBTest.exe
 D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\DZ_USBTest.pdb
-D:\CSharpProjects\USBSpeedTest\USBSpeedTest\USBSpeedTest\obj\Debug\USBSpeedTest.csprojResolveAssemblyReference.cache

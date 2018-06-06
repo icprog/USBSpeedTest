@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
@@ -138,6 +139,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.查看AD数据ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -153,7 +156,7 @@
             this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBox1.Location = new System.Drawing.Point(0, 0);
             this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(212, 551);
+            this.richTextBox1.Size = new System.Drawing.Size(260, 555);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
             // 
@@ -921,10 +924,11 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.查看寄存器表ToolStripMenuItem});
+            this.查看寄存器表ToolStripMenuItem,
+            this.查看AD数据ToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(914, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(962, 25);
             this.menuStrip1.TabIndex = 15;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -981,7 +985,7 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.richTextBox1);
-            this.splitContainer1.Size = new System.Drawing.Size(914, 551);
+            this.splitContainer1.Size = new System.Drawing.Size(962, 555);
             this.splitContainer1.SplitterDistance = 698;
             this.splitContainer1.TabIndex = 89;
             // 
@@ -1402,11 +1406,24 @@
             this.textBox1.Size = new System.Drawing.Size(67, 21);
             this.textBox1.TabIndex = 2;
             // 
+            // 查看AD数据ToolStripMenuItem
+            // 
+            this.查看AD数据ToolStripMenuItem.Name = "查看AD数据ToolStripMenuItem";
+            this.查看AD数据ToolStripMenuItem.Size = new System.Drawing.Size(85, 21);
+            this.查看AD数据ToolStripMenuItem.Text = "查看AD数据";
+            this.查看AD数据ToolStripMenuItem.Click += new System.EventHandler(this.查看AD数据ToolStripMenuItem_Click);
+            // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1000;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 576);
+            this.ClientSize = new System.Drawing.Size(962, 580);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.menuStrip1);
@@ -1545,6 +1562,8 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox13;
         private System.Windows.Forms.Button button12;
+        private System.Windows.Forms.ToolStripMenuItem 查看AD数据ToolStripMenuItem;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

@@ -1,4 +1,11 @@
 
 USBSpeedTest/.vs/USBSpeedTest/v15/.suo
+<<<<<<< HEAD
 USBSpeedTest/.vs/USBSpeedTest/v15/Server/sqlite3/db.lock
 USBSpeedTest/.vs/USBSpeedTest/v15/Server/sqlite3/storage.ide
+=======
+*.dat
+*.pdb
+*.pdb
+*.Cache
+>>>>>>> 01eb5beca5df2fcaa1e00d875cf0b7b617ede018

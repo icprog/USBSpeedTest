@@ -67,6 +67,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ADForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ADForm.Designer.cs">
+      <DependentUpon>ADForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Data.cs" />
     <Compile Include="DiskInfo.cs" />
     <Compile Include="LogDLL.cs" />
@@ -87,6 +93,9 @@
     </Compile>
     <Compile Include="SaveFile.cs" />
     <Compile Include="USB.cs" />
+    <EmbeddedResource Include="ADForm.resx">
+      <DependentUpon>ADForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
