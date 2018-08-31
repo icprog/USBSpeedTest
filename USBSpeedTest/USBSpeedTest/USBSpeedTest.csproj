@@ -7,10 +7,11 @@
     <ProjectGuid>{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>USBSpeedTest</RootNamespace>
-    <AssemblyName>DZ_USBTest</AssemblyName>
+    <AssemblyName>单元测试仪自测程序</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -47,6 +47,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>earth.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CyUSB">
@@ -132,6 +135,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="寄存器.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="earth.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

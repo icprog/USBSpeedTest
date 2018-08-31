@@ -14,6 +14,7 @@ namespace USBSpeedTest
         public static int SCid = 0;
         public static int OCid = 2;
         public static int DARid = 3;
+        public static int OnlyId = 0;
 
         public static bool SaveSC1 = true;
         public static bool SaveSC2= true;
@@ -38,6 +39,7 @@ namespace USBSpeedTest
 
      //   public static object synObj_dq0 = new object();
         public static object synObj_sc1 = new object();
+
 
 
         public static Queue<byte[]> DataQueue1 = new Queue<byte[]>();   //For FrameEPDU deal with 同步下行1

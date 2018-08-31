@@ -131,26 +131,27 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
                     MyLog.Info(USB.MyDeviceList[key].FriendlyName + ConfigurationManager.AppSettings[USB.MyDeviceList[key].FriendlyName] + "连接");
 
+                    Data.OnlyId = key;
 
-                    USB.SendCMD(0, 0x81, 0x7f);
+                    USB.SendCMD(Data.OnlyId, 0x81, 0x7f);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x81, 0x00);
+                    USB.SendCMD(Data.OnlyId, 0x81, 0x00);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x82, 0x7f);
+                    USB.SendCMD(Data.OnlyId, 0x82, 0x7f);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x82, 0x00);
+                    USB.SendCMD(Data.OnlyId, 0x82, 0x00);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x83, 0x7f);
+                    USB.SendCMD(Data.OnlyId, 0x83, 0x7f);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x83, 0x00);
+                    USB.SendCMD(Data.OnlyId, 0x83, 0x00);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x84, 0x7f);
+                    USB.SendCMD(Data.OnlyId, 0x84, 0x7f);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x84, 0x00);
+                    USB.SendCMD(Data.OnlyId, 0x84, 0x00);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x85, 0x7f);
+                    USB.SendCMD(Data.OnlyId, 0x85, 0x7f);
                     Thread.Sleep(100);
-                    USB.SendCMD(0, 0x85, 0x00);
+                    USB.SendCMD(Data.OnlyId, 0x85, 0x00);
                     Thread.Sleep(100);
 
                 }
@@ -166,55 +167,58 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         bool RecvTag = false;
         private void button1_Click(object sender, EventArgs e)
         {
-            if (this.button1.Text == "Start")
+            if (this.button1.Text == "开始读取")
             {
                 this.textBox1.Text = null;
                 this.textBox2.Text = null;
                 this.textBox3.Text = null;
 
-                this.button1.Text = "Stop";
+                this.button1.Text = "停止读取";
 
-                for (int i = 0; i < 9; i++)
+
+                if (USB.MyDeviceList[Data.OnlyId] != null)
                 {
-                    if (USB.MyDeviceList[i] != null)
+
+                    CyControlEndPoint CtrlEndPt = null;
+                    CtrlEndPt = USB.MyDeviceList[Data.OnlyId].ControlEndPt;
+
+                    if (CtrlEndPt != null)
                     {
+                        USB.SendCMD(Data.OnlyId, 0x80, 0x01);
+                        USB.SendCMD(Data.OnlyId, 0x80, 0x00);
 
-                        CyControlEndPoint CtrlEndPt = null;
-                        CtrlEndPt = USB.MyDeviceList[i].ControlEndPt;
+                        USB.MyDeviceList[Data.OnlyId].Reset();
 
-                        if (CtrlEndPt != null)
-                        {
-                            USB.SendCMD(i, 0x80, 0x01);
-                            USB.SendCMD(i, 0x80, 0x00);
+                        Register.Byte80H = (byte)(Register.Byte80H | 0x04);
+                        USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
 
-                            USB.MyDeviceList[i].Reset();
+                        this.btn_80_2.Text = "1:接收";
 
-                            Register.Byte80H = (byte)(Register.Byte80H | 0x04);
-                            USB.SendCMD(i, 0x80, Register.Byte80H);
-
-                            this.btn_80_2.Text = "1";
-
-                        }
                     }
+
+                    FileThread = new SaveFile();
+                    FileThread.FileInit();
+                    FileThread.FileSaveStart();
+
+                    MyLog.Info("开始读取");
+                    RecvTag = true;
+
+                    ThisCount = 0;
+                    LastCount = 0;
+
+                    new Thread(() => { RecvAllUSB(); }).Start();
+                    new Thread(() => { DealWithADFun(); }).Start();
+
                 }
-
-                FileThread = new SaveFile();
-                FileThread.FileInit();
-                FileThread.FileSaveStart();
-
-                MyLog.Info("开始读取");
-                RecvTag = true;
-
-                ThisCount = 0;
-                LastCount = 0;
-
-                new Thread(() => { RecvAllUSB(); }).Start();
-                new Thread(() => { DealWithADFun(); }).Start();
+                else
+                {
+                    MyLog.Error("单元测试仪未连接！");
+                }
 
             }
             else
             {
-                this.button1.Text = "Start";
+                this.button1.Text = "开始读取";
                 ThisCount = 0;
                 LastCount = 0;
                 RecvTag = false;
@@ -227,7 +231,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         int Recv4KCounts = 0;
         private void RecvAllUSB()
         {
-            CyUSBDevice MyDevice01 = USB.MyDeviceList[Data.SCid];
+            CyUSBDevice MyDevice01 = USB.MyDeviceList[Data.OnlyId];
 
             startDT = DateTime.Now;
             DateTime midDT = startDT;
@@ -263,7 +267,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                             }
                             else
                             {
-                                MyLog.Error("数传422机箱 收到异常帧！");
+                                MyLog.Error("收到异常帧！");
                                 Trace.WriteLine("收到异常帧" + TempStoreBufTag.ToString());
                                 Array.Clear(TempStoreBuf, 0, TempStoreBufTag);
                                 TempStoreBufTag = 0;
@@ -272,11 +276,11 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                     }
                     else if (buflen == 0)
                     {
-                        //Trace.WriteLine("数传422机箱 收到0包-----0000000000");
+                        //   Trace.WriteLine("数传422机箱 收到0包-----0000000000");
                     }
                     else
                     {
-                        Trace.WriteLine("数传422机箱 收到buflen <0");
+                        Trace.WriteLine("收到buflen <0");
                     }
 
                     endDT = DateTime.Now;
@@ -476,7 +480,6 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
                 lock (Data.ADList01)
                 {
-
                     if (Data.ADList01.Count > 16)
                     {
                         Tag1 = true;
@@ -502,11 +505,10 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                                 Data.daRe_AD01[k] = value;
                         }
                         Data.ADList01.RemoveRange(0, 16);
-
                     }
                     else
                     {
-                        Tag1 = false;        
+                        Tag1 = false;
                     }
 
                 }
@@ -582,18 +584,18 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         private void button2_Click(object sender, EventArgs e)
         {
             Register.Byte81H = (byte)(Register.Byte81H | 0x01);
-            USB.SendCMD(0, 0x81, Register.Byte81H);
+            USB.SendCMD(Data.OnlyId, 0x81, Register.Byte81H);
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            USB.SendCMD(0, 0x81, 0x00);
+            USB.SendCMD(Data.OnlyId, 0x81, 0x00);
 
             Register.Byte80H = (byte)(Register.Byte80H | 0x01);
-            USB.SendCMD(0, 0x80, Register.Byte80H);
+            USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
 
             Register.Byte80H = (byte)(Register.Byte80H & 0xfe);
-            USB.SendCMD(0, 0x80, Register.Byte80H);
+            USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
 
 
         }
@@ -601,7 +603,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         private void button4_Click(object sender, EventArgs e)
         {
             Register.Byte81H = (byte)(Register.Byte81H | 0x08);
-            USB.SendCMD(0, 0x81, Register.Byte81H);
+            USB.SendCMD(Data.OnlyId, 0x81, Register.Byte81H);
 
         }
 
@@ -623,7 +625,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 }
                 else
                 {
-                    USB.SendCMD(0, addr, value);
+                    USB.SendCMD(Data.OnlyId, addr, value);
                 }
 
             }
@@ -669,7 +671,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
                 byte[] temp = StrToHexByte(textBox8.Text + lenth.ToString("x4") + Str_Content + textBox9.Text);
 
-                USB.SendData(0, temp);
+                USB.SendData(Data.OnlyId, temp);
             }
             else
             {
@@ -696,31 +698,31 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 {
                     case 0x80:
                         Register.Byte80H = (byte)(Register.Byte80H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x80, Register.Byte80H);
+                        USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
                         break;
                     case 0x81:
                         Register.Byte81H = (byte)(Register.Byte81H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x81, Register.Byte81H);
+                        USB.SendCMD(Data.OnlyId, 0x81, Register.Byte81H);
                         break;
                     case 0x82:
                         Register.Byte82H = (byte)(Register.Byte82H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x82, Register.Byte82H);
+                        USB.SendCMD(Data.OnlyId, 0x82, Register.Byte82H);
                         break;
                     case 0x83:
                         Register.Byte83H = (byte)(Register.Byte83H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x83, Register.Byte83H);
+                        USB.SendCMD(Data.OnlyId, 0x83, Register.Byte83H);
                         break;
                     case 0x84:
                         Register.Byte84H = (byte)(Register.Byte84H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x84, Register.Byte84H);
+                        USB.SendCMD(Data.OnlyId, 0x84, Register.Byte84H);
                         break;
                     case 0x85:
                         Register.Byte85H = (byte)(Register.Byte85H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x85, Register.Byte85H);
+                        USB.SendCMD(Data.OnlyId, 0x85, Register.Byte85H);
                         break;
                     default:
                         Register.Byte80H = (byte)(Register.Byte80H | (byte)(0x01 << bitpos));
-                        USB.SendCMD(0, 0x80, Register.Byte80H);
+                        USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
                         break;
                 }
 
@@ -735,31 +737,31 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
             //    {
             //        case 0x80:
             //            Register.Byte80H = (byte)(Register.Byte80H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x80, Register.Byte80H);
+            //            USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
             //            break;
             //        case 0x81:
             //            Register.Byte81H = (byte)(Register.Byte81H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x81, Register.Byte81H);
+            //            USB.SendCMD(Data.OnlyId, 0x81, Register.Byte81H);
             //            break;
             //        case 0x82:
             //            Register.Byte82H = (byte)(Register.Byte82H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x82, Register.Byte82H);
+            //            USB.SendCMD(Data.OnlyId, 0x82, Register.Byte82H);
             //            break;
             //        case 0x83:
             //            Register.Byte83H = (byte)(Register.Byte83H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x83, Register.Byte83H);
+            //            USB.SendCMD(Data.OnlyId, 0x83, Register.Byte83H);
             //            break;
             //        case 0x84:
             //            Register.Byte84H = (byte)(Register.Byte84H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x84, Register.Byte84H);
+            //            USB.SendCMD(Data.OnlyId, 0x84, Register.Byte84H);
             //            break;
             //        case 0x85:
             //            Register.Byte85H = (byte)(Register.Byte85H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x85, Register.Byte85H);
+            //            USB.SendCMD(Data.OnlyId, 0x85, Register.Byte85H);
             //            break;
             //        default:
             //            Register.Byte80H = (byte)(Register.Byte80H | (byte)(0x01 << bitpos));
-            //            USB.SendCMD(0, 0x80, Register.Byte80H);
+            //            USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
             //            break;
             //    }
 
@@ -776,31 +778,31 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 {
                     case 0x80:
                         Register.Byte80H = (byte)(Register.Byte80H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x80, Register.Byte80H);
+                        USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
                         break;
                     case 0x81:
                         Register.Byte81H = (byte)(Register.Byte81H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x81, Register.Byte81H);
+                        USB.SendCMD(Data.OnlyId, 0x81, Register.Byte81H);
                         break;
                     case 0x82:
                         Register.Byte82H = (byte)(Register.Byte82H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x82, Register.Byte82H);
+                        USB.SendCMD(Data.OnlyId, 0x82, Register.Byte82H);
                         break;
                     case 0x83:
                         Register.Byte83H = (byte)(Register.Byte83H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x83, Register.Byte83H);
+                        USB.SendCMD(Data.OnlyId, 0x83, Register.Byte83H);
                         break;
                     case 0x84:
                         Register.Byte84H = (byte)(Register.Byte84H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x84, Register.Byte84H);
+                        USB.SendCMD(Data.OnlyId, 0x84, Register.Byte84H);
                         break;
                     case 0x85:
                         Register.Byte85H = (byte)(Register.Byte85H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x85, Register.Byte85H);
+                        USB.SendCMD(Data.OnlyId, 0x85, Register.Byte85H);
                         break;
                     default:
                         Register.Byte80H = (byte)(Register.Byte80H & (byte)(0x7f - (byte)(0x01 << bitpos)));
-                        USB.SendCMD(0, 0x80, Register.Byte80H);
+                        USB.SendCMD(Data.OnlyId, 0x80, Register.Byte80H);
                         break;
                 }
 
@@ -843,7 +845,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                 {
                     byte[] temp = StrToHexByte((0x1D00 + j).ToString("x4") + lenth.ToString("x4") + Str_Content + textBox9.Text);
                     temp[4] = (byte)(0x1 + j);
-                    USB.SendData(0, temp);
+                    USB.SendData(Data.OnlyId, temp);
                 }
             }
             else
@@ -853,7 +855,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         }
 
         public SerialPort ComPortRecv;
-        int DisLen = 2000000;
+        int DisLen = 145000;
         private void btn_SerialOpen_2_Click(object sender, EventArgs e)
         {
             try
@@ -943,23 +945,63 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
                         if (ExecDec) DisLen -= DecKM;
                         for (int j = 0; j < 30; j++)
                         {
-                            this.textBox11.BeginInvoke(new Action(() => { this.textBox11.AppendText((DisLen / 10).ToString() + "m， "); }));
+                            this.textBox11.BeginInvoke(new Action(() => { this.textBox11.AppendText((DisLen).ToString() + "m， "); }));
 
-                            //MyLog.Info((DisLen / 10).ToString() + "m");
-                            if (DisLen > 0)
+                            //if (DisLen > 0)
+                            //{
+                            //    SendToMac[11] = (byte)(DisLen & 0xff);
+                            //    SendToMac[12] = (byte)((DisLen >> 8) & 0xff);
+                            //    SendToMac[13] = (byte)((DisLen >> 16) & 0xff);
+                            //    SendToMac[14] = (byte)((DisLen >> 24) & 0xff);
+                            //}
+                            if (DisLen > 125 && DisLen <= 145)
                             {
-                                SendToMac[11] = (byte)(DisLen & 0xff);
-                                SendToMac[12] = (byte)((DisLen >> 8) & 0xff);
-                                SendToMac[13] = (byte)((DisLen >> 16) & 0xff);
-                                SendToMac[14] = (byte)((DisLen >> 24) & 0xff);
+                                SendToMac[11] = 0x1f;
+                                SendToMac[12] = 0xff;
+                                SendToMac[13] = 0xff;
+                                SendToMac[14] = 0xff;
+                            }
+                            else if (DisLen > 120 && DisLen <= 125)
+                            {
+                                SendToMac[11] = 0x0f;
+                                SendToMac[12] = 0xff;
+                                SendToMac[13] = 0xff;
+                                SendToMac[14] = 0xff;
+                            }
+                            else if (DisLen > 40 && DisLen <= 120)
+                            {
+                                SendToMac[11] = 0x00;
+                                SendToMac[12] = 0xff;
+                                SendToMac[13] = 0xff;
+                                SendToMac[14] = 0xff;
+                            }
+                            else if (DisLen > 30 && DisLen <= 40)
+                            {
+                                SendToMac[11] = 0x00;
+                                SendToMac[12] = 0x0f;
+                                SendToMac[13] = 0xff;
+                                SendToMac[14] = 0xff;
+                            }
+                            else if (DisLen > 15 && DisLen <= 30)
+                            {
+                                SendToMac[11] = 0x00;
+                                SendToMac[12] = 0x00;
+                                SendToMac[13] = 0xff;
+                                SendToMac[14] = 0xff;
+                            }
+                            else if (DisLen > 8.5 && DisLen <= 15)
+                            {
+                                SendToMac[11] = 0x00;
+                                SendToMac[12] = 0x00;
+                                SendToMac[13] = 0x0f;
+                                SendToMac[14] = 0xff;
                             }
                             else
                             {
-                                DisLen = 0;
                                 SendToMac[11] = 0x00;
                                 SendToMac[12] = 0x00;
                                 SendToMac[13] = 0x00;
-                                SendToMac[14] = 0x00;
+                                SendToMac[14] = 0xff;
                             }
 
                             ComPortRecv.Write(SendToMac, 0, SendToMac.Count());
@@ -1020,7 +1062,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
         private void button4_Click_1(object sender, EventArgs e)
         {
-            DisLen = 2000000;
+            DisLen = 145000;
         }
 
         private void button6_Click_1(object sender, EventArgs e)
@@ -1031,18 +1073,18 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
         private void button8_Click(object sender, EventArgs e)
         {
             double t = double.Parse(textBox12.Text);
-            DisLen = (int)(t * 10000);
+            DisLen = (int)(t * 1000);
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
-            USB.SendCMD(0, 0x82, 0x7f);
+            USB.SendCMD(Data.OnlyId, 0x82, 0x7f);
             Thread.Sleep(100);
-            USB.SendCMD(0, 0x82, 0x00);
+            USB.SendCMD(Data.OnlyId, 0x82, 0x00);
             Thread.Sleep(100);
-            USB.SendCMD(0, 0x83, 0x01);
+            USB.SendCMD(Data.OnlyId, 0x83, 0x01);
             Thread.Sleep(100);
-            USB.SendCMD(0, 0x83, 0x00);
+            USB.SendCMD(Data.OnlyId, 0x83, 0x00);
         }
 
         bool ExecDec = false;
@@ -1060,11 +1102,12 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
             }
         }
 
-        int DecKM = 5000;
+        int DecKM = 500;
         private void button12_Click(object sender, EventArgs e)
         {
             double t = double.Parse(textBox13.Text);
-            DecKM = (int)(t * 10);
+            //    DecKM = (int)(t * 10);
+            DecKM = (int)(t);
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -1081,7 +1124,7 @@ Search the device with VID-PID 04b4-00F1 and if found, select the end point
 
         private void 查看AD数据ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(Data.AdFrmIsAlive)
+            if (Data.AdFrmIsAlive)
             {
                 myADForm.Activate();
             }
