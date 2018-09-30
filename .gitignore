@@ -12,3 +12,4 @@ USBSpeedTest/.vs/USBSpeedTest/v15/Server/sqlite3/storage.ide
 USBSpeedTest/USBSpeedTest/bin/*.*
 USBSpeedTest/USBSpeedTest/obj/*.*
 USBSpeedTest/.vs/USBSpeedTest/v15/*.*
+*.txt
