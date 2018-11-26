@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "USBSpeedTest", "USBSpeedTest\USBSpeedTest.csproj", "{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BA2638C-5F0E-40A5-A403-6199ADA49E0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED32ECE7-70E5-4891-AE60-9EE4E6C80C8A}
+	EndGlobalSection
+EndGlobal
